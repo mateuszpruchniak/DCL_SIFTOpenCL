@@ -13,4 +13,4 @@ ADD_SUBDIRECTORY(Components)
 
 ADD_SUBDIRECTORY(Types)
 
-CONFIGURE_FILE(SIFTOpenCLConfig.cmake.in ${CMAKE_INSTALL_PREFIX}/SIFTOpenCLConfig.cmake @ONLY)
+CONFIGURE_FILE(CvBasicConfig.cmake.in ${CMAKE_INSTALL_PREFIX}/CvBasicConfig.cmake @ONLY)
