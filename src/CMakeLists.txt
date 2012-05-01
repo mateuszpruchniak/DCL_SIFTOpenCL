@@ -1,5 +1,5 @@
 SET(CMAKE_INCLUDE_CURRENT_DIR ON)
-#SET(WITH_OPENCL ON)
+SET(WITH_OPENCL ON)
 
 include_directories(.)
 
@@ -38,4 +38,4 @@ ADD_SUBDIRECTORY(Components)
 ADD_SUBDIRECTORY(Types)
 
 # Prepare config file to use from another DCLs
-CONFIGURE_FILE(DCL_SIFTOpenCLConfig.cmake.in ${CMAKE_INSTALL_PREFIX}/DCL_SIFTOpenCLConfig.cmake @ONLY)
+CONFIGURE_FILE(SIFTOpenCLConfig.cmake.in ${CMAKE_INSTALL_PREFIX}/SIFTOpenCLConfig.cmake @ONLY)
