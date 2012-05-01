@@ -9,6 +9,6 @@ FILE(GLOB files *.cpp)
 
 # Create an executable file from sources:
 ADD_LIBRARY(procSIFTOpenCL SHARED ${files})
-TARGET_LINK_LIBRARIES(procSIFTOpenCL ${OpenCV_LIBS} ${DisCODe_LIBRARIES})
+TARGET_LINK_LIBRARIES(procSIFTOpenCL ${OpenCV_LIBS} ${DisCODe_LIBRARIES} ${OPENCL_LIBRARY})
 
 INSTALL_COMPONENT(procSIFTOpenCL)
