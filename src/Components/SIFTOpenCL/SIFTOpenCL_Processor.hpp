@@ -16,6 +16,8 @@
 
 #include <cv.h>
 #include <highgui.h>
+#include <CL/cl.h>
+
 
 #include "Types/stream_OpenCV.hpp"
 
