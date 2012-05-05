@@ -15,60 +15,75 @@ GPUBase::GPUBase(char* source, char* KernelName)
 	iBlockDimX = 16;
 	iBlockDimY = 16;
 
-
+	printf("\n -------------------------- \n");
 
 	// Fetch the Platform and Device IDs; we only want one.
-        GPUError=clGetPlatformIDs(1, &cpPlatform, &platforms);
-        if (GPUError != CL_SUCCESS) {
-                printf("\n Error number %d", GPUError);
-        }
+	GPUError=clGetPlatformIDs(1, &cpPlatform, &platforms);
+	if (GPUError != CL_SUCCESS) {
+			printf("\n Error number %d", GPUError);
+	}
+	
+	printf("clGetPlatformIDs \n");
 
-        GPUError=clGetDeviceIDs(cpPlatform, CL_DEVICE_TYPE_ALL, 1, &device, &devices);
-        if (GPUError != CL_SUCCESS) 
-		printf("\n Error number %d", GPUError);
-        
+	GPUError=clGetDeviceIDs(cpPlatform, CL_DEVICE_TYPE_ALL, 1, &device, &devices);
+	
+	printf("Error number %d \n", GPUError);
+	
+	printf("clGetDeviceIDs2 \n");
 
-        cl_context_properties properties[]={
-                CL_CONTEXT_PLATFORM, (cl_context_properties)cpPlatform,
-                0};
-        // Note that nVidia's OpenCL requires the platform property
-        cl_context context=clCreateContext(properties, 1, &device, NULL, NULL, &GPUError);
-        if (GPUError != CL_SUCCESS) {
-                printf("\n Error number %d", GPUError);
-        }
+	cl_context_properties properties[]={
+			CL_CONTEXT_PLATFORM, (cl_context_properties)cpPlatform,
+			0};
+	
+	printf("clCreateContext Before \n");
+	
+	// Note that nVidia's OpenCL requires the platform property
+	cl_context GPUContext = clCreateContext(properties, 1, &device, NULL, NULL, &GPUError);
+	printf("Error number %d \n", GPUError);
+	printf("clCreateContext \n");
+	
+	
+	
+	cl_command_queue GPUCommandQueue = clCreateCommandQueue(GPUContext, device, 0, &GPUError);
+	if (GPUError != CL_SUCCESS) {
+			printf("\n Error number %d", GPUError);
+	}
 
-        cl_command_queue cq = clCreateCommandQueue(GPUContext, device, 0, &GPUError);
-        if (GPUError != CL_SUCCESS) {
-                printf("\n Error number %d", GPUError);
-        }
-
+	
+	
+	
+	printf("clCreateCommandQueue \n");
 		
-	// Load OpenCL kernel
+    // Load OpenCL kernel
 	SourceOpenCLShared = oclLoadProgSource("/home/mati/Dropbox/MGR/DisCODe/DCL_SIFTOpenCL/src/Components/SIFTOpenCL/OpenCL/GPUCode.cl", "// My comment\n", &szKernelLength);
 
 	SourceOpenCL = oclLoadProgSource(source, "// My comment\n", &szKernelLengthFilter);
+	
+	printf("oclLoadProgSource \n");
+	
+	
 	szKernelLengthSum = szKernelLength + szKernelLengthFilter;
 	char* sourceCL = new char[szKernelLengthSum];
 	strcpy(sourceCL,SourceOpenCLShared);
 	strcat (sourceCL, SourceOpenCL);
 	
+	
+	
 	GPUProgram = clCreateProgramWithSource( GPUContext , 1, (const char **)&sourceCL, &szKernelLengthSum, &GPUError);
 	CheckError(GPUError);
+	
+	printf("clCreateProgramWithSource \n");
+	
 
 	// Build the program with 'mad' Optimization option
 	char *flags = "-cl-unsafe-math-optimizations -cl-fast-relaxed-math -cl-mad-enable";
 
 	GPUError = clBuildProgram(GPUProgram, 0, NULL, flags, NULL, NULL);
-	//error checking code
-	if(!GPUError)
-	{
-		//print kernel compilation error
-		char programLog[1024];
-		clGetProgramBuildInfo(GPUProgram, cdDevices[0], CL_PROGRAM_BUILD_LOG, 1024, programLog, 0);
-		cout<<programLog<<endl;
-	}
-
-
+	CheckError(GPUError);
+	
+	
+	printf("clBuildProgram  \n");
+	
 	cout << kernelFuncName << endl;
 
 	GPUKernel = clCreateKernel(GPUProgram, kernelFuncName, &GPUError);

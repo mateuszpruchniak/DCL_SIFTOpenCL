@@ -9,6 +9,8 @@ DetectExtrema::~DetectExtrema(void)
 
 DetectExtrema::DetectExtrema(int _maxNumberKeys, Keys* _keys): GPUBase("/home/mati/Dropbox/MGR/DisCODe/DCL_SIFTOpenCL/src/Components/SIFTOpenCL/OpenCL/DetectExtrema.cl","ckDetect")
 {
+	printf("DetectExtrema Constr \n");
+	
 	counter = 0;
 	numberExtr = 0;
 	numberExtrRej = 0;
@@ -47,8 +49,12 @@ DetectExtrema::DetectExtrema(int _maxNumberKeys, Keys* _keys): GPUBase("/home/ma
 	GPUError = clEnqueueWriteBuffer(GPUCommandQueue, cmDevBufKeys, CL_TRUE, 0, maxNumberKeys*sizeof(Keys), (void*)keys, 0, NULL, NULL);
 	CheckError(GPUError);
 
+	printf("clCreateKernel Before  \n");
+	
 	GPUKernelDesc = clCreateKernel(GPUProgram, "ckDesc", &GPUError);
 	CheckError(GPUError);
+	
+	printf("clCreateKernel After \n");
 
 }
 

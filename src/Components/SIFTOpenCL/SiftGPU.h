@@ -92,7 +92,7 @@ struct detection_data
 
 #define	SIFTCPU		0
 
-#define SIFT_MAX_NUMBER_KEYS		1000
+#define SIFT_MAX_NUMBER_KEYS		2000
 
 
 class SiftGPU

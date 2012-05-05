@@ -83,6 +83,9 @@ public:
 protected:
 
 	SiftGPU* siftGPU;
+	feature* features;
+	
+	
 
 	/*!
 	 * Connects source to given device.
