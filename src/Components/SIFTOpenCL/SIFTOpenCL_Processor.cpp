@@ -18,6 +18,10 @@ namespace SIFTOpenCL {
 SIFTOpenCL_Processor::SIFTOpenCL_Processor(const std::string & name) : Base::Component(name)
 {
 	LOG(LTRACE) << "Hello SIFTOpenCL_Processor\n";
+
+	siftOpenCL = new SIFTOpenCL();
+
+
 }
 
 SIFTOpenCL_Processor::~SIFTOpenCL_Processor()
