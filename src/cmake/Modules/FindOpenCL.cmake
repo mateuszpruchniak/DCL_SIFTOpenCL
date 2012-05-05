@@ -1,77 +1,74 @@
-# - Try to find OpenCL
-# This module tries to find an OpenCL implementation on your system. It supports
-# AMD / ATI, Apple and NVIDIA implementations, but shoudl work, too.
-#
-# Once done this will define
-#  OPENCL_FOUND        - system has OpenCL
-#  OPENCL_INCLUDE_DIRS  - the OpenCL include directory
-#  OPENCL_LIBRARIES    - link these to use OpenCL
-#
-# WIN32 should work, but is untested
-
-FIND_PACKAGE( PackageHandleStandardArgs )
-
-SET (OPENCL_VERSION_STRING "0.1.0")
-SET (OPENCL_VERSION_MAJOR 0)
-SET (OPENCL_VERSION_MINOR 1)
-SET (OPENCL_VERSION_PATCH 0)
-
-IF (APPLE)
-
-  FIND_LIBRARY(OPENCL_LIBRARIES OpenCL DOC "OpenCL lib for OSX")
-  FIND_PATH(OPENCL_INCLUDE_DIRS OpenCL/cl.h DOC "Include for OpenCL on OSX")
-
-ELSE (APPLE)
-
-	IF (WIN32)
-	
-	    FIND_PATH(OPENCL_INCLUDE_DIRS CL/cl.h)
-	    FIND_PATH(_OPENCL_CPP_INCLUDE_DIRS CL/cl.hpp)
-	
-	    # The AMD SDK currently installs both x86 and x86_64 libraries
-	    # This is only a hack to find out architecture
-	    IF( ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "AMD64" )
-	    	SET(OPENCL_LIB_DIR "$ENV{ATISTREAMSDKROOT}/lib/x86_64")
-	    ELSE (${CMAKE_SYSTEM_PROCESSOR} STREQUAL "AMD64")
-	    	SET(OPENCL_LIB_DIR "$ENV{ATISTREAMSDKROOT}/lib/x86")
-	    ENDIF( ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "AMD64" )
-	    FIND_LIBRARY(OPENCL_LIBRARIES OpenCL.lib ${OPENCL_LIB_DIR})
-	    
-	    GET_FILENAME_COMPONENT(_OPENCL_INC_CAND ${OPENCL_LIB_DIR}/../../include ABSOLUTE)
-	    
-	    # On Win32 search relative to the library
-	    FIND_PATH(OPENCL_INCLUDE_DIRS CL/cl.h PATHS "${_OPENCL_INC_CAND}")
-	    FIND_PATH(_OPENCL_CPP_INCLUDE_DIRS CL/cl.hpp PATHS "${_OPENCL_INC_CAND}")
-	
-	ELSE (WIN32)
-
-            # Unix style platforms
-            FIND_LIBRARY(OPENCL_LIBRARIES OpenCL
-              ENV LD_LIBRARY_PATH
-            )
-
-            GET_FILENAME_COMPONENT(OPENCL_LIB_DIR ${OPENCL_LIBRARIES} PATH)
-            GET_FILENAME_COMPONENT(_OPENCL_INC_CAND ${OPENCL_LIB_DIR}/../../include ABSOLUTE)
-
-            # The AMD SDK currently does not place its headers
-            # in /usr/include, therefore also search relative
-            # to the library
-            FIND_PATH(OPENCL_INCLUDE_DIRS CL/cl.h PATHS ${_OPENCL_INC_CAND})
-            FIND_PATH(_OPENCL_CPP_INCLUDE_DIRS CL/cl.hpp PATHS ${_OPENCL_INC_CAND})
-
-	ENDIF (WIN32)
-
-ENDIF (APPLE)
-
-FIND_PACKAGE_HANDLE_STANDARD_ARGS( OpenCL DEFAULT_MSG OPENCL_LIBRARIES OPENCL_INCLUDE_DIRS )
-
-IF( _OPENCL_CPP_INCLUDE_DIRS )
-	SET( OPENCL_HAS_CPP_BINDINGS TRUE )
-	LIST( APPEND OPENCL_INCLUDE_DIRS ${_OPENCL_CPP_INCLUDE_DIRS} )
-	# This is often the same, so clean up
-	LIST( REMOVE_DUPLICATES OPENCL_INCLUDE_DIRS )
-ENDIF( _OPENCL_CPP_INCLUDE_DIRS )
-
-MARK_AS_ADVANCED(
-  OPENCL_INCLUDE_DIRS
+set(
+  OPENCL_INC_SEARCH_PATH
+  ${OPENCL_INCLUDE_DIR}
+  ${OPENCL_DIR}/include
+  ${OPENCL_DIR}/OpenCL/common/inc
+  $ENV{OPENCL_INCLUDE_DIR}
+  $ENV{OPENCL_DIR}/include
+  $ENV{OPENCL_DIR}/OpenCL/common/inc
+  /usr/local/include
+  /usr/include
+  # Append additional search directories for OpenCL include files here.
 )
+
+set(
+  OPENCL_LIB_SEARCH_PATH
+  ${OPENCL_LIBRARY_DIR}
+  ${OPENCL_DIR}/lib
+  ${OPENCL_DIR}/lib/x86
+  $ENV{OPENCL_LIBRARY_DIR}
+  $ENV{OPENCL_DIR}/lib
+  $ENV{OPENCL_DIR}/lib/x86
+  /usr/local/lib64
+  /usr/local/lib
+  /usr/lib64
+  /usr/lib
+  # Append additional search directories for OpenCL libraries here.
+)
+
+if("${CMAKE_SYSTEM_PROCESSOR}" EQUAL "x86_64")
+  set(
+        OPENCL_LIB_SEARCH_PATH
+        ${OPENCL_LIB_SEARCH_PATH}
+        ${OPENCL_DIR}/OpenCL/common/lib/Linux64
+        $ENV{OPENCL_DIR}/OpenCL/common/lib/Linux64
+        )
+else("${CMAKE_SYSTEM_PROCESSOR}" EQUAL "x86_64")
+  set(
+        OPENCL_LIB_SEARCH_PATH
+        ${OPENCL_LIB_SEARCH_PATH}
+        ${OPENCL_DIR}/OpenCL/common/lib/Linux32
+        $ENV{OPENCL_DIR}/OpenCL/common/lib/Linux32
+        )
+endif("${CMAKE_SYSTEM_PROCESSOR}" EQUAL "x86_64")
+
+# Do not change anything of below (except if bugs encountered).
+find_path(
+  OPENCL_INCLUDE_DIR
+  NAMES CL/cl.h
+  PATHS ${OPENCL_INC_SEARCH_PATH}
+  )
+
+find_library(
+  OPENCL_LIBRARY
+  NAMES OpenCL
+  PATHS ${OPENCL_LIB_SEARCH_PATH}
+  )
+
+include(FindPackageHandleStandardArgs)
+find_package_handle_standard_args(
+  OPENCL
+  DEFAULT_MSG
+  OPENCL_LIBRARY OPENCL_INCLUDE_DIR
+  )
+
+if(OPENCL_FOUND)
+  set(OPENCL_LIBRARIES ${OPENCL_LIBRARY})
+else(OPENCL_FOUND)
+  set(OPENCL_LIBRARIES)
+endif(OPENCL_FOUND)
+
+mark_as_advanced(
+  OPENCL_INCLUDE_DIR
+  OPENCL_LIBRARY
+  )

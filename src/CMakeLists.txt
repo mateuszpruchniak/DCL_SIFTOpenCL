@@ -17,9 +17,8 @@ include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 FIND_PACKAGE( OpenCV REQUIRED )
 
 IF(WITH_OPENCL)
-    FIND_PACKAGE( OpenCL REQUIRED )
-    include_directories(${OpenCL_INCLUDE_DIR})
-    set(LIBS ${LIBS} ${OpenCL_LIBRARY})
+	find_package(OpenCL REQUIRED)
+	include_directories(${OPENCL_INCLUDE_DIR})
 ELSE(WITH_OPENCL)
 	
 ENDIF(WITH_OPENCL)

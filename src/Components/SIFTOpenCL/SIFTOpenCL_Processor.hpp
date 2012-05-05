@@ -19,7 +19,7 @@
 
 #include "Types/stream_OpenCV.hpp"
 
-
+#include "SiftGPU.h"
 
 namespace Processors {
 namespace SIFTOpenCL {
@@ -29,8 +29,7 @@ using namespace cv;
 /*!
  * \brief CvThreshold properties
  */
-struct SIFTOpenCLProps: public Base::Props
-{
+struct SIFTOpenCLProps: public Base::Props {
 	cv::Size2i kernel;
 
 	double sigmax;
@@ -39,9 +38,8 @@ struct SIFTOpenCLProps: public Base::Props
 	/*!
 	 * \copydoc Base::Props::load
 	 */
-	void load(const ptree & pt)
-	{
-		kernel = pt.get("kernel", cv::Size2i(71,71));
+	void load(const ptree & pt) {
+		kernel = pt.get("kernel", cv::Size2i(71, 71));
 
 		sigmax = pt.get("sigmax", 0.0);
 		sigmay = pt.get("sigmay", 0.0);
@@ -50,8 +48,7 @@ struct SIFTOpenCLProps: public Base::Props
 	/*!
 	 * \copydoc Base::Props::save
 	 */
-	void save(ptree & pt)
-	{
+	void save(ptree & pt) {
 		pt.put("kernel", kernel);
 
 		pt.put("sigmax", sigmax);
@@ -64,8 +61,7 @@ struct SIFTOpenCLProps: public Base::Props
  * \class SIFTOpenCL_Processor
  * \brief Example processor class.
  */
-class SIFTOpenCL_Processor: public Base::Component
-{
+class SIFTOpenCL_Processor: public Base::Component {
 public:
 	/*!
 	 * Constructor.
@@ -80,12 +76,13 @@ public:
 	/*!
 	 * Return window properties
 	 */
-	Base::Props * getProperties()
-	{
+	Base::Props * getProperties() {
 		return &props;
 	}
 
 protected:
+
+	SiftGPU* siftGPU;
 
 	/*!
 	 * Connects source to given device.
@@ -112,31 +109,29 @@ protected:
 	 */
 	bool onStop();
 
-
 	/*!
 	 * Event handler function.
 	 */
 	void onNewImage();
 
 	/// Event handler.
-	Base::EventHandler <SIFTOpenCL_Processor> h_onNewImage;
+	Base::EventHandler<SIFTOpenCL_Processor> h_onNewImage;
 
 	/// Input data stream
-	Base::DataStreamIn <Mat> in_img;
+	Base::DataStreamIn<Mat> in_img;
 
 	/// Event raised, when image is processed
 	Base::Event * newImage;
 
 	/// Output data stream - processed image
-	Base::DataStreamOut <Mat> out_img;
+	Base::DataStreamOut<Mat> out_img;
 
 	/// Threshold properties
 	SIFTOpenCLProps props;
 };
 
-}//: namespace SIFTOpenCL
-}//: namespace Processors
-
+} //: namespace SIFTOpenCL
+} //: namespace Processors
 
 /*
  * Register processor component.

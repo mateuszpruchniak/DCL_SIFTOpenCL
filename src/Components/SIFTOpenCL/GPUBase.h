@@ -12,6 +12,7 @@
 #include "cv.h"
 #include "cxmisc.h"
 #include "highgui.h"
+#include <stdarg.h>
 
 using namespace std;
 
@@ -48,7 +49,7 @@ class GPUBase
     public:
         
 
-	cl_device_id device;
+		cl_device_id device;
         cl_uint platforms, devices;
 
 		/*!

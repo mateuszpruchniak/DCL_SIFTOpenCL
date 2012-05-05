@@ -19,7 +19,7 @@ SIFTOpenCL_Processor::SIFTOpenCL_Processor(const std::string & name) : Base::Com
 {
 	LOG(LTRACE) << "Hello SIFTOpenCL_Processor\n";
 
-	siftOpenCL = new SIFTOpenCL();
+	siftGPU = new SiftGPU();
 
 
 }

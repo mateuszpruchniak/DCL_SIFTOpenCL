@@ -9,7 +9,6 @@ Copyright (C) 2006-2010  Rob Hess <hess@eecs.oregonstate.edu>
 #include "utils.h"
 #include "imgfeatures.h"
 
-#include "StdAfx.h"
 #include <cxcore.h>
 
 #include <math.h>

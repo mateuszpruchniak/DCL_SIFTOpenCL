@@ -1,7 +1,7 @@
 ﻿
 
 #include "GPUBase.h"
-#include <CL/cl.h>
+
 
 
 GPUBase::GPUBase(char* source, char* KernelName)
