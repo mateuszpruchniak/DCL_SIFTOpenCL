@@ -11,6 +11,8 @@ DetectExtrema::DetectExtrema(int _maxNumberKeys, Keys* _keys): GPUBase("/home/ma
 {
 	printf("DetectExtrema Constr \n");
 	
+	
+	
 	counter = 0;
 	numberExtr = 0;
 	numberExtrRej = 0;
@@ -53,6 +55,8 @@ DetectExtrema::DetectExtrema(int _maxNumberKeys, Keys* _keys): GPUBase("/home/ma
 	
 	GPUKernelDesc = clCreateKernel(GPUProgram, "ckDesc", &GPUError);
 	CheckError(GPUError);
+	
+	
 	
 	printf("clCreateKernel After \n");
 

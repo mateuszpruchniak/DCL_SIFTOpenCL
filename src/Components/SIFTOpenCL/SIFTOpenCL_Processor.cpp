@@ -72,9 +72,12 @@ void SIFTOpenCL_Processor::onNewImage()
 {
 	LOG(LTRACE) << "SIFTOpenCL_Processor::onNewImage\n";
 	try {
+		
+		cout << "SIFTOpenCL_Processor::onNewImage" << endl;
+		
 		cv::Mat img = in_img.read();
 		//cv::Mat out = img.clone();
-		cv::GaussianBlur(img, img, props.kernel, props.sigmax, props.sigmay);
+		//cv::GaussianBlur(img, img, props.kernel, props.sigmax, props.sigmay);
 		out_img.write(img);
 		newImage->raise();
 	} catch (...) {
