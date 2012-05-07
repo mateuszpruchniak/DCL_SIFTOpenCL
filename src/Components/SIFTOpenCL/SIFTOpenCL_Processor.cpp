@@ -76,8 +76,12 @@ void SIFTOpenCL_Processor::onNewImage()
 		cout << "SIFTOpenCL_Processor::onNewImage" << endl;
 		
 		cv::Mat img = in_img.read();
-		//cv::Mat out = img.clone();
-		//cv::GaussianBlur(img, img, props.kernel, props.sigmax, props.sigmay);
+		
+		IplImage ipl = img;
+		
+		siftGPU->DoSift(&ipl);
+		
+		
 		out_img.write(img);
 		newImage->raise();
 	} catch (...) {
