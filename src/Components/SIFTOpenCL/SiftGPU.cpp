@@ -18,8 +18,6 @@
 	 
 	 Keys keys[SIFT_MAX_NUMBER_KEYS];
 	 
-	 
-	 
 	 meanFilter = new MeanFilter();
 	 subtract = new Subtract();
 	 detectExt = new DetectExtrema(SIFT_MAX_NUMBER_KEYS, keys);
@@ -51,6 +49,7 @@ int FeatureCmp( void* feat1, void* feat2, void* param )
 
  int SiftGPU::DoSift( IplImage* img )
  {
+ 	printf("\n ----------- DoSift START --------------- \n");
 	IplImage* init_img;
 	IplImage*** dog_pyr;
 	CvMemStorage* storage;
@@ -91,6 +90,9 @@ int FeatureCmp( void* feat1, void* feat2, void* param )
 	cvReleaseImage( &init_img );
 	ReleasePyr( &gauss_pyr, octvs, intvls + 3 );
 	ReleasePyr( &dog_pyr, octvs, intvls + 2 );
+	
+	printf("Found: %d \n", n);
+	printf("\n ----------- DoSift End --------------- \n");
 	
 	return n;
  }
