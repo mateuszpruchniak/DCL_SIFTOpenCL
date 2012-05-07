@@ -14,50 +14,12 @@ GPUBase::GPUBase(char* source, char* KernelName)
 	iBlockDimX = 16;
 	iBlockDimY = 16;
 
-	printf("\n -------------------------- \n");
 	
-	
-	// Fetch the Platform and Device IDs; we only want one.
-	GPUError=clGetPlatformIDs(1, &cpPlatform, &platforms);
-	if (GPUError != CL_SUCCESS) {
-			printf("\n Error number %d", GPUError);
-	}
-	
-	printf("clGetPlatformIDs \n");
-	
-	GPUError=clGetDeviceIDs(cpPlatform, CL_DEVICE_TYPE_GPU, 1, &device, &devices);
-	
-	printf("Error number %d \n", GPUError);
-	
-	printf("clGetDeviceIDs2 \n");
-
-	cl_context_properties properties[]={
-			CL_CONTEXT_PLATFORM, (cl_context_properties)cpPlatform,
-			0};
-	
-	printf("clCreateContext Before \n");
-	printf("dev %d \n", device);
-	
-	// Note that nVidia's OpenCL requires the platform property
-	GPUContext = clCreateContext(properties, 1, &device, NULL, NULL, &GPUError);
-	
-	printf("Error number %d \n", GPUError);
-	printf("clCreateContext \n");
-	
-	
-	
-	GPUCommandQueue = clCreateCommandQueue(GPUContext, device, 0, &GPUError);
-	if (GPUError != CL_SUCCESS) {
-			printf("\n Error number %d", GPUError);
-	}
-
-	
-	
-	
-	printf("clCreateCommandQueue \n");
+	GPUContext = GPU::getInstance().GPUContext;
+	GPUCommandQueue = GPU::getInstance().GPUCommandQueue;
 	
 		
-    // Load OpenCL kernel
+    	// Load OpenCL kernel
 	SourceOpenCLShared = oclLoadProgSource("/home/mati/Dropbox/MGR/DisCODe/DCL_SIFTOpenCL/src/Components/SIFTOpenCL/OpenCL/GPUCode.cl", "// My comment\n", &szKernelLength);
 
 	SourceOpenCL = oclLoadProgSource(source, "// My comment\n", &szKernelLengthFilter);
