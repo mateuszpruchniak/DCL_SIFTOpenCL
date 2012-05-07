@@ -66,16 +66,33 @@ int FeatureCmp( void* feat1, void* feat2, void* param )
 	/* build scale space pyramid; smallest dimension of top level is ~4 pixels */
 
 	init_img = CreateInitialImg( img, img_dbl, sigma );
+	
+	cout << "1 CreateInitialImg " << endl;
 
 	octvs = log( (float)MIN( init_img->width, init_img->height ) ) / log((float)2) - 2;
+	
+	cout << "Liczba octvs: " << octvs << endl;
+	
+	
 	gauss_pyr = BuildGaussPyr( init_img, octvs, intvls, sigma );
+	
+	cout << "BuildGaussPyr" << endl;
+	
 	dog_pyr = BuildDogPyr( gauss_pyr, octvs, intvls );
+	
+	cout << "BuildDogPyr" << endl;
+	
 	storage = cvCreateMemStorage( 0 );
+	
+	cout << "cvCreateMemStorage" << endl;
 
 	features = ScaleSpaceExtrema( dog_pyr, octvs, intvls, contr_thr, curv_thr, storage );
 
+	cout << "ScaleSpaceExtrema" << endl;
 
 	/* sort features by decreasing scale and move from CvSeq to array */
+	
+	
 	cvSeqSort( features, (CvCmpFunc)FeatureCmp, NULL );
 	n = features->total;
 	feat = (feature*)calloc( n, sizeof(feature) );
