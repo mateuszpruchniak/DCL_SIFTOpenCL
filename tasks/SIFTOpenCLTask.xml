@@ -12,10 +12,6 @@
 			<maxval>192</maxval>
 		</Proc>
 
-		<Window type="CvWindow" thread="Thread1" group="s1">
-			<title>Preview</title>
-			<count>2</count>
-		</Window>
 	</Components>
 
 	<!-- Threads of execution -->
@@ -29,7 +25,6 @@
 	<Events>
 		<Event source="Mov1.newImage" destination="Window.onNewImage1"/>
 		<Event source="Mov1.newImage" destination="Proc.onNewImage"/>
-		<Event source="Proc.newImage" destination="Window.onNewImage0"/>
 	</Events>
 
 	<!-- Data stream assignments -->
@@ -43,10 +38,6 @@
 			<out_img type="out" group="Con2"/>
 		</Proc>
 
-		<Window>
-			<in_img0 type="in" group="Con2"/>
-			<in_img1 type="in" group="Con"/>
-		</Window>
 	</DataStreams>
 
 </Task>
