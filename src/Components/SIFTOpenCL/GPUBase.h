@@ -41,57 +41,57 @@ class GPU
  {
   private:
 
-		cl_device_id device;
-		
-		cl_uint platforms, devices;
+	cl_device_id device;
+	
+	cl_uint platforms, devices;
 
-		cl_int GPUError;
+	cl_int GPUError;
 
-		/*!
-		 * Platforms are represented by a cl_platform_id, OpenCL framework allow an application to share resources and execute kernels on devices in the platform.
-		 */
-		cl_platform_id cpPlatform;
+	/*!
+	 * Platforms are represented by a cl_platform_id, OpenCL framework allow an application to share resources and execute kernels on devices in the platform.
+	 */
+	cl_platform_id cpPlatform;
 
         GPU() 
-		{
-			printf("\n ----------- SINGLETON START --------------- \n");
-			// Fetch the Platform and Device IDs; we only want one.
-			GPUError =c lGetPlatformIDs(1, &cpPlatform, &platforms);
-			if (GPUError != CL_SUCCESS) {
-					printf("\n Error number %d", GPUError);
-			}
-
-			GPUError=clGetDeviceIDs(cpPlatform, CL_DEVICE_TYPE_GPU, 1, &device, &devices);
-
-			cl_context_properties properties[]={
-			CL_CONTEXT_PLATFORM, (cl_context_properties)cpPlatform,
-			0};
-	
-			// Note that nVidia's OpenCL requires the platform property
-			GPUContext = clCreateContext(properties, 1, &device, NULL, NULL, &GPUError);
-			GPUCommandQueue = clCreateCommandQueue(GPUContext, device, 0, &GPUError);
-			if (GPUError != CL_SUCCESS) {
-					printf("\n Error number %d", GPUError);
-			}
-			printf("\n ----------- SINGLETON END --------------- \n");
+	{
+		printf("\n ----------- SINGLETON START --------------- \n");
+		// Fetch the Platform and Device IDs; we only want one.
+		GPUError =c lGetPlatformIDs(1, &cpPlatform, &platforms);
+		if (GPUError != CL_SUCCESS) {
+				printf("\n Error number %d", GPUError);
 		}
 
-        GPU(const singleton &);
+		GPUError=clGetDeviceIDs(cpPlatform, CL_DEVICE_TYPE_GPU, 1, &device, &devices);
 
-        GPU& operator=(const singleton&);
+		cl_context_properties properties[]={
+		CL_CONTEXT_PLATFORM, (cl_context_properties)cpPlatform,
+		0};
+
+		// Note that nVidia's OpenCL requires the platform property
+		GPUContext = clCreateContext(properties, 1, &device, NULL, NULL, &GPUError);
+		GPUCommandQueue = clCreateCommandQueue(GPUContext, device, 0, &GPUError);
+		if (GPUError != CL_SUCCESS) {
+				printf("\n Error number %d", GPUError);
+		}
+		printf("\n ----------- SINGLETON END --------------- \n");
+	}
+
+        GPU(const GPU&);
+
+        GPU& operator=(const GPU&);
 
   public:
 
-		/*!
-		 * OpenCL command-queue, is an object where OpenCL commands are enqueued to be executed by the device.
-		 * "The command-queue is created on a specific device in a context [...] Having multiple command-queues allows applications to queue multiple independent commands without requiring synchronization." (OpenCL Specification).
-		 */
-		cl_command_queue GPUCommandQueue; 
-		
-		/*!
-		 * Context defines the entire OpenCL environment, including OpenCL kernels, devices, memory management, command-queues, etc. Contexts in OpenCL are referenced by an cl_context object
-		 */
-		cl_context GPUContext; 
+	/*!
+	 * OpenCL command-queue, is an object where OpenCL commands are enqueued to be executed by the device.
+	 * "The command-queue is created on a specific device in a context [...] Having multiple command-queues allows applications to queue multiple independent commands without requiring synchronization." (OpenCL Specification).
+	 */
+	cl_command_queue GPUCommandQueue; 
+	
+	/*!
+	 * Context defines the entire OpenCL environment, including OpenCL kernels, devices, memory management, command-queues, etc. Contexts in OpenCL are referenced by an cl_context object
+	 */
+	cl_context GPUContext; 
 
         static GPU& getInstance()
         {
@@ -107,25 +107,25 @@ class GPUBase
     public:
         
 		
-		/*!
-		 * OpenCL command-queue, is an object where OpenCL commands are enqueued to be executed by the device.
-		 * "The command-queue is created on a specific device in a context [...] Having multiple command-queues allows applications to queue multiple independent commands without requiring synchronization." (OpenCL Specification).
-		 */
-		cl_command_queue GPUCommandQueue; 
+	/*!
+	 * OpenCL command-queue, is an object where OpenCL commands are enqueued to be executed by the device.
+	 * "The command-queue is created on a specific device in a context [...] Having multiple command-queues allows applications to queue multiple independent commands without requiring synchronization." (OpenCL Specification).
+	 */
+	cl_command_queue GPUCommandQueue; 
 
-		/*!
-		 * Context defines the entire OpenCL environment, including OpenCL kernels, devices, memory management, command-queues, etc. Contexts in OpenCL are referenced by an cl_context object
-		 */
-		cl_context GPUContext;  
-	
-		/*!
-		 * Kernels are essentially functions that we can call from the host and that will run on the device
-		 */
-		cl_kernel GPUKernel;
+	/*!
+	 * Context defines the entire OpenCL environment, including OpenCL kernels, devices, memory management, command-queues, etc. Contexts in OpenCL are referenced by an cl_context object
+	 */
+	cl_context GPUContext;  
 
-		/*!
-		 * Error code, only 0 is allowed.
-		 */
+	/*!
+	 * Kernels are essentially functions that we can call from the host and that will run on the device
+	 */
+	cl_kernel GPUKernel;
+
+	/*!
+	 * Error code, only 0 is allowed.
+	 */
         cl_int GPUError;	
 
     	/*!
@@ -166,39 +166,39 @@ class GPUBase
 		 */
         size_t GPUGlobalWorkSize[2];
 
-		char* kernelFuncName;
-		
-		cl_mem* buffersListIn;
+	char* kernelFuncName;
+	
+	cl_mem* buffersListIn;
 
-		int* sizeBuffersIn;
+	int* sizeBuffersIn;
 
-		int numberOfBuffersIn;
+	int numberOfBuffersIn;
 
-		cl_mem* buffersListOut;
+	cl_mem* buffersListOut;
 
-		int* sizeBuffersOut;
+	int* sizeBuffersOut;
 
-		int numberOfBuffersOut;
+	int numberOfBuffersOut;
 
-		GPUBase();
+	GPUBase();
 
-		~GPUBase();
+	~GPUBase();
 
-		GPUBase(char* source, char* KernelName);
+	GPUBase(char* source, char* KernelName);
 
-		bool CreateBuffersIn(int maxBufferSize, int numberOfBuffers);
+	bool CreateBuffersIn(int maxBufferSize, int numberOfBuffers);
 
-		bool CreateBuffersOut(int maxBufferSize, int numberOfBuffers);
+	bool CreateBuffersOut(int maxBufferSize, int numberOfBuffers);
 
-		bool SendImageToBuffers(IplImage* img, ... );
+	bool SendImageToBuffers(IplImage* img, ... );
 
-		bool ReceiveImageData(IplImage* img, ... );
+	bool ReceiveImageData(IplImage* img, ... );
 
-		size_t shrRoundUp(int group_size, int global_size);
+	size_t shrRoundUp(int group_size, int global_size);
 
-		char* oclLoadProgSource(const char* cFilename, const char* cPreamble, size_t* szFinalLength);
+	char* oclLoadProgSource(const char* cFilename, const char* cPreamble, size_t* szFinalLength);
 
-		int GetKernelSize(double sigma, double cut_off=0.001);
+	int GetKernelSize(double sigma, double cut_off=0.001);
 };
 
 
