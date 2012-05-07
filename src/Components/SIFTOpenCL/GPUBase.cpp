@@ -20,19 +20,10 @@ GPUBase::GPUBase(char* source, char* KernelName)
 	GPUContext = GPU::getInstance().GPUContext;
 	GPUCommandQueue = GPU::getInstance().GPUCommandQueue;
 	
-		
     	// Load OpenCL kernel
 	SourceOpenCLShared = oclLoadProgSource("/home/mati/Dropbox/MGR/DisCODe/DCL_SIFTOpenCL/src/Components/SIFTOpenCL/OpenCL/GPUCode.cl", "// My comment\n", &szKernelLength);
 
 	SourceOpenCL = oclLoadProgSource(source, "// My comment\n", &szKernelLengthFilter);
-	
-	printf("oclLoadProgSource \n");
-	
-	cout << "Pliki:" << endl;
-	cout << szKernelLength << endl;
-	cout << szKernelLengthFilter << endl;
-	
-	
 	
 	szKernelLengthSum = szKernelLength + szKernelLengthFilter + 100;
 	char* sourceCL = new char[szKernelLengthSum];
@@ -44,8 +35,6 @@ GPUBase::GPUBase(char* source, char* KernelName)
 	
 	GPUProgram = clCreateProgramWithSource( GPUContext , 1, (const char **)&sourceCL, &szKernelLengthSum, &GPUError);
 	CheckError(GPUError);
-	
-	printf("clCreateProgramWithSource \n");
 
 	// Build the program with 'mad' Optimization option
 	char *flags = "-cl-unsafe-math-optimizations";
@@ -53,11 +42,6 @@ GPUBase::GPUBase(char* source, char* KernelName)
 	GPUError = clBuildProgram(GPUProgram, 0, NULL, flags, NULL, NULL);
 	CheckError(GPUError);
 	
-	
-	printf("clBuildProgram  \n");
-	
-	cout << kernelFuncName << endl;
-
 	GPUKernel = clCreateKernel(GPUProgram, kernelFuncName, &GPUError);
 	CheckError(GPUError);
 
@@ -134,24 +118,24 @@ bool GPUBase::SendImageToBuffers(IplImage* img, ... )
 	//double duration = 0;
 	//start = clock();
 
-		imageHeight = img->height;
-		imageWidth = img->width;
+	imageHeight = img->height;
+	imageWidth = img->width;
 
-		sizeBuffersIn[0] = img->width*img->height*sizeof(float);
-		GPUError = clEnqueueWriteBuffer(GPUCommandQueue, buffersListIn[0], CL_TRUE, 0, img->width*img->height*sizeof(float) , (void*)img->imageData, 0, NULL, NULL);
+	sizeBuffersIn[0] = img->width*img->height*sizeof(float);
+	GPUError = clEnqueueWriteBuffer(GPUCommandQueue, buffersListIn[0], CL_TRUE, 0, img->width*img->height*sizeof(float) , (void*)img->imageData, 0, NULL, NULL);
+	CheckError(GPUError);
+
+	va_list arg_ptr;
+	va_start(arg_ptr, img);
+
+	for(int i = 1 ; i<numberOfBuffersIn ; i++)
+	{
+		IplImage* tmpImg = va_arg(arg_ptr, IplImage*);
+		sizeBuffersIn[i] = tmpImg->width*tmpImg->height*sizeof(float);
+		GPUError = clEnqueueWriteBuffer(GPUCommandQueue, buffersListIn[i], CL_TRUE, 0, tmpImg->width*tmpImg->height*sizeof(float) , (void*)tmpImg->imageData, 0, NULL, NULL);
 		CheckError(GPUError);
-
-		va_list arg_ptr;
-		va_start(arg_ptr, img);
-	
-		for(int i = 1 ; i<numberOfBuffersIn ; i++)
-		{
-			IplImage* tmpImg = va_arg(arg_ptr, IplImage*);
-			sizeBuffersIn[i] = tmpImg->width*tmpImg->height*sizeof(float);
-			GPUError = clEnqueueWriteBuffer(GPUCommandQueue, buffersListIn[i], CL_TRUE, 0, tmpImg->width*tmpImg->height*sizeof(float) , (void*)tmpImg->imageData, 0, NULL, NULL);
-			CheckError(GPUError);
-		}
-		va_end(arg_ptr);
+	}
+	va_end(arg_ptr);
 
 	//finish = clock();
 	//duration = (double)(finish - start) / CLOCKS_PER_SEC;
