@@ -57,18 +57,73 @@ GPUBase::GPUBase()
 
 bool GPUBase::CreateBuffersIn(int maxBufferSize, int numbOfBuffers)
 {
-	numberOfBuffersIn = numbOfBuffers;
-	buffersListIn = new cl_mem[numberOfBuffersIn];
-	sizeBuffersIn = new int[numberOfBuffersIn];
-
-	for (int i = 0; i < numberOfBuffersIn ; i++)
-	{
-		buffersListIn[i] = clCreateBuffer(GPUContext, CL_MEM_READ_WRITE, maxBufferSize, NULL, &GPUError);
-		CheckError(GPUError);
-	}
+	GPU::getInstance().CreateBuffersIn(maxBufferSize,numbOfBuffers);
 
 	return true;
 }
+
+bool GPUBase::CreateBuffersOut( int maxBufferSize, int numbOfBuffers)
+{
+	GPU::getInstance().CreateBuffersOut(maxBufferSize,numbOfBuffers);
+	
+	return true;
+}
+
+
+
+bool GPU::CreateBuffersIn(int maxBufferSize, int numbOfBuffers)
+{
+	if( maxBufferSize > maxNumberBufIn)
+	{
+		if(maxNumberBufIn > 0)
+		{
+			for(int i = 0 ; i < numberOfBuffersIn ; i++)
+			{
+				if(buffersListIn[i])clReleaseMemObject(buffersListIn[i]);
+			}
+		}
+		
+		maxNumberBufIn = maxBufferSize;
+		numberOfBuffersIn = numbOfBuffers;
+		buffersListIn = new cl_mem[numberOfBuffersIn];
+	
+		for (int i = 0; i < numberOfBuffersIn ; i++)
+		{
+			buffersListIn[i] = clCreateBuffer(GPUContext, CL_MEM_READ_WRITE, maxBufferSize, NULL, &GPUError);
+			cout << "Alokacja buforu wynik: " << GPUError << endl;
+		}
+	}
+	return true;
+}
+
+
+
+bool GPU::CreateBuffersOut( int maxBufferSize, int numbOfBuffers)
+{
+	if( maxBufferSize > maxNumberBufOut)
+	{
+		if(maxNumberBufOut > 0)
+		{
+			for(int i = 0 ; i < numberOfBuffersOut ; i++)
+			{
+				if(buffersListOut[i])clReleaseMemObject(buffersListOut[i]);
+			}
+		}
+		
+		maxNumberBufOut = maxBufferSize;
+		numberOfBuffersOut = numbOfBuffers;
+		buffersListOut = new cl_mem[numberOfBuffersOut];
+	
+		for (int i = 0; i < numberOfBuffersOut ; i++)
+		{
+			buffersListOut[i] = clCreateBuffer(GPUContext, CL_MEM_READ_WRITE, maxBufferSize, NULL, &GPUError);
+			cout << "Alokacja buforu wynik: " << GPUError << endl;
+		}
+	}
+	return true;
+}
+
+
 
 int GPUBase::GetKernelSize(double sigma, double cut_off)
 {
@@ -81,19 +136,7 @@ int GPUBase::GetKernelSize(double sigma, double cut_off)
 }
 
 
-bool GPUBase::CreateBuffersOut( int maxBufferSize, int numbOfBuffers)
-{
-	numberOfBuffersOut = numbOfBuffers;
-	buffersListOut = new cl_mem[numberOfBuffersOut];
-	sizeBuffersOut = new int[numberOfBuffersOut];
 
-	for (int i = 0; i < numberOfBuffersOut ; i++)
-	{
-		buffersListOut[i] = clCreateBuffer(GPUContext, CL_MEM_READ_WRITE, maxBufferSize, NULL, &GPUError);
-		CheckError(GPUError);
-	}
-	return true;
-}
 
 
 void GPUBase::CheckError( int code )
@@ -104,14 +147,14 @@ void GPUBase::CheckError( int code )
 		return;
 		break;
 	default:
-		cout << "OTHERS ERROR" << endl;
+		cout << "ERROR : " << code << endl;
 	}
 }
 
 
 bool GPUBase::SendImageToBuffers(IplImage* img, ... )
 {
-	if(buffersListIn == NULL)
+	if(GPU::getInstance().buffersListIn == NULL)
 		return false;
 
 	//clock_t start, finish;
@@ -121,18 +164,19 @@ bool GPUBase::SendImageToBuffers(IplImage* img, ... )
 	imageHeight = img->height;
 	imageWidth = img->width;
 
-	sizeBuffersIn[0] = img->width*img->height*sizeof(float);
-	GPUError = clEnqueueWriteBuffer(GPUCommandQueue, buffersListIn[0], CL_TRUE, 0, img->width*img->height*sizeof(float) , (void*)img->imageData, 0, NULL, NULL);
+	cout << "Zapis do buforu obrazu: " << img->width << "x" << img->height << endl;
+	cout << "Liczba buf in: " << GPU::getInstance().numberOfBuffersIn << endl;
+	
+	GPUError = clEnqueueWriteBuffer(GPUCommandQueue, GPU::getInstance().buffersListIn[0], CL_TRUE, 0, img->width*img->height*sizeof(float) , (void*)img->imageData, 0, NULL, NULL);
 	CheckError(GPUError);
 
 	va_list arg_ptr;
 	va_start(arg_ptr, img);
 
-	for(int i = 1 ; i<numberOfBuffersIn ; i++)
+	for(int i = 1 ; i < GPU::getInstance().numberOfBuffersIn ; i++)
 	{
 		IplImage* tmpImg = va_arg(arg_ptr, IplImage*);
-		sizeBuffersIn[i] = tmpImg->width*tmpImg->height*sizeof(float);
-		GPUError = clEnqueueWriteBuffer(GPUCommandQueue, buffersListIn[i], CL_TRUE, 0, tmpImg->width*tmpImg->height*sizeof(float) , (void*)tmpImg->imageData, 0, NULL, NULL);
+		GPUError = clEnqueueWriteBuffer(GPUCommandQueue, GPU::getInstance().buffersListIn[i], CL_TRUE, 0, tmpImg->width*tmpImg->height*sizeof(float) , (void*)tmpImg->imageData, 0, NULL, NULL);
 		CheckError(GPUError);
 	}
 	va_end(arg_ptr);
@@ -146,21 +190,19 @@ bool GPUBase::SendImageToBuffers(IplImage* img, ... )
 
 bool GPUBase::ReceiveImageData( IplImage* img, ... )
 {
-	if(buffersListOut == NULL)
+	if(GPU::getInstance().buffersListOut == NULL)
 		return false;
 
-	sizeBuffersOut[0] = img->width*img->height*sizeof(float);
-	GPUError = clEnqueueReadBuffer(GPUCommandQueue, buffersListOut[0], CL_TRUE, 0, img->width*img->height*sizeof(float) , (void*)img->imageData, 0, NULL, NULL);
+	GPUError = clEnqueueReadBuffer(GPUCommandQueue, GPU::getInstance().buffersListOut[0], CL_TRUE, 0, img->width*img->height*sizeof(float) , (void*)img->imageData, 0, NULL, NULL);
 	CheckError(GPUError);
 
 	va_list arg_ptr;
 	va_start(arg_ptr, img);
 
-	for(int i = 1 ; i<numberOfBuffersOut ; i++)
+	for(int i = 1 ; i<GPU::getInstance().numberOfBuffersOut ; i++)
 	{
 		IplImage* tmpImg = va_arg(arg_ptr, IplImage*);
-		sizeBuffersOut[i] = tmpImg->width*tmpImg->height*sizeof(float);
-		GPUError = clEnqueueReadBuffer(GPUCommandQueue, buffersListOut[i], CL_TRUE, 0, tmpImg->width*tmpImg->height*sizeof(float) , (void*)tmpImg->imageData, 0, NULL, NULL);
+		GPUError = clEnqueueReadBuffer(GPUCommandQueue, GPU::getInstance().buffersListOut[i], CL_TRUE, 0, tmpImg->width*tmpImg->height*sizeof(float) , (void*)tmpImg->imageData, 0, NULL, NULL);
 		CheckError(GPUError);
 	}
 	va_end(arg_ptr);
@@ -226,14 +268,14 @@ GPUBase::~GPUBase()
 	if(GPUCommandQueue)clReleaseCommandQueue(GPUCommandQueue);
 	if(GPUContext)clReleaseContext(GPUContext);
 
-	for(int i = 1 ; i<numberOfBuffersOut ; i++)
+	for(int i = 0 ; i<GPU::getInstance().numberOfBuffersOut ; i++)
 	{
-		if(buffersListOut[i])clReleaseMemObject(buffersListOut[i]);
+		if(GPU::getInstance().buffersListOut[i])clReleaseMemObject(GPU::getInstance().buffersListOut[i]);
 	}
 
-	for(int i = 1 ; i<numberOfBuffersIn ; i++)
+	for(int i = 0 ; i<GPU::getInstance().numberOfBuffersIn ; i++)
 	{
-		if(buffersListIn[i])clReleaseMemObject(buffersListIn[i]);
+		if(GPU::getInstance().buffersListIn[i])clReleaseMemObject(GPU::getInstance().buffersListIn[i]);
 	}
 }
 

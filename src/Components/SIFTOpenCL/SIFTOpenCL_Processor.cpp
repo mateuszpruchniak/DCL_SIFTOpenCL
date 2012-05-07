@@ -81,6 +81,7 @@ void SIFTOpenCL_Processor::onNewImage()
 		
 		siftGPU->DoSift(&ipl);
 		
+		getchar();
 		
 		out_img.write(img);
 		newImage->raise();

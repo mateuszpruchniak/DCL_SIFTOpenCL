@@ -38,21 +38,21 @@ typedef struct
 
 
 class GPU
- {
+{
   private:
 
 	cl_device_id device;
-	
-	cl_uint platforms, devices;
-
+	cl_uint platforms;
+	cl_uint devices;
 	cl_int GPUError;
 
+	
 	/*!
 	 * Platforms are represented by a cl_platform_id, OpenCL framework allow an application to share resources and execute kernels on devices in the platform.
 	 */
 	cl_platform_id cpPlatform;
 
-        GPU() 
+    GPU() 
 	{
 		printf("\n ----------- SINGLETON START --------------- \n");
 		// Fetch the Platform and Device IDs; we only want one.
@@ -73,12 +73,21 @@ class GPU
 		if (GPUError != CL_SUCCESS) {
 				printf("\n Error number %d", GPUError);
 		}
+		
+		maxNumberBufIn  = 0;
+		maxNumberBufOut = 0;
+		
 		printf("\n ----------- SINGLETON END --------------- \n");
 	}
+    
+	
+	int maxNumberBufIn;
+	
+	int maxNumberBufOut;
 
-        GPU(const GPU&);
-
-        GPU& operator=(const GPU&);
+    GPU(const GPU&);
+    
+    GPU& operator=(const GPU&);
 
   public:
 
@@ -92,13 +101,25 @@ class GPU
 	 * Context defines the entire OpenCL environment, including OpenCL kernels, devices, memory management, command-queues, etc. Contexts in OpenCL are referenced by an cl_context object
 	 */
 	cl_context GPUContext; 
+	
+	cl_mem* buffersListIn;
 
-        static GPU& getInstance()
-        {
-          static GPU instance;
-          return instance;
-        }
- };
+	int numberOfBuffersIn;
+
+	cl_mem* buffersListOut;
+
+	int numberOfBuffersOut;
+	
+	bool CreateBuffersIn(int maxBufferSize, int numberOfBuffers);
+
+	bool CreateBuffersOut(int maxBufferSize, int numberOfBuffers);
+	
+	static GPU& getInstance()
+	{
+	  static GPU instance;
+	  return instance;
+	}
+};
 
 
 
@@ -126,59 +147,48 @@ class GPUBase
 	/*!
 	 * Error code, only 0 is allowed.
 	 */
-        cl_int GPUError;	
+	cl_int GPUError;	
 
-    	/*!
-    	 * Program is formed by a set of kernels, functions and declarations, and it's represented by an cl_program object.
-    	 */
-    	cl_program GPUProgram;
-		  
+	/*!
+	 * Program is formed by a set of kernels, functions and declarations, and it's represented by an cl_program object.
+	 */
+	cl_program GPUProgram;
+	  
 
-		/*!
-		 * Check error code.
-		 */
-        void CheckError(int code);
+	/*!
+	 * Check error code.
+	 */
+	void CheckError(int code);
 
-		
+	
 
-		/*!
-		 * Work-group size - dim X.
-		 */
-        int iBlockDimX;                    
+	/*!
+	 * Work-group size - dim X.
+	 */
+	int iBlockDimX;                    
 
-		/*!
-		 * Work-group size - dim Y.
-		 */
-        int iBlockDimY;  
+	/*!
+	 * Work-group size - dim Y.
+	 */
+	int iBlockDimY;  
 
-		/*!
-		 * Image width.
-		 */
-        unsigned int imageWidth;   
+	/*!
+	 * Image width.
+	 */
+	unsigned int imageWidth;   
 
-		/*!
-		 * Image height.
-		 */
-        unsigned int imageHeight; 
+	/*!
+	 * Image height.
+	 */
+	unsigned int imageHeight; 
 
-		/*!
-		 * Global size of NDRange.
-		 */
-        size_t GPUGlobalWorkSize[2];
+	/*!
+	 * Global size of NDRange.
+	 */
+	size_t GPUGlobalWorkSize[2];
 
 	char* kernelFuncName;
 	
-	cl_mem* buffersListIn;
-
-	int* sizeBuffersIn;
-
-	int numberOfBuffersIn;
-
-	cl_mem* buffersListOut;
-
-	int* sizeBuffersOut;
-
-	int numberOfBuffersOut;
 
 	GPUBase();
 

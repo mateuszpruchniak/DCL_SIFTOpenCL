@@ -55,6 +55,11 @@ int FeatureCmp( void* feat1, void* feat2, void* param )
 	CvMemStorage* storage;
 	CvSeq* features;
 	int octvs, i, n = 0;
+	
+	cout << "Stworzenie buforu obrazu: " << 2 * img->width << "x" << 2 * img->height << endl;
+	
+	meanFilter->CreateBuffersIn(4*img->width*img->height*sizeof(float),5);
+	meanFilter->CreateBuffersOut(4*img->width*img->height*sizeof(float),3);
 
 	/* check arguments */
 	if( ! img )
@@ -183,6 +188,8 @@ based on contrast and ratio of principal curvatures.
 	detectExt->CreateBuffersOut(img->width*img->height*sizeof(float),1);
 	/************************ GPU **************************/
 
+	cout << "Po stworzeniu buforow" << endl;
+	
 	clock_t start, finish;
 	double duration = 0;
 	start = clock();
@@ -190,7 +197,7 @@ based on contrast and ratio of principal curvatures.
 	for( o = 0; o < octvs; o++ )
 		for( i = 1; i <= intvls; i++ )
 		{
-			/************************ GPU **************************/
+			
 			if(SIFTCPU)
 			{
 
@@ -247,10 +254,18 @@ based on contrast and ratio of principal curvatures.
 			}
 			else 
 			{
+				/************************ GPU **************************/
+				
 				num = 0;
 				detectExt->SendImageToBuffers(dog_pyr[o][i-1],dog_pyr[o][i],dog_pyr[o][i+1], gauss_pyr[o][i]);
-				detectExt->Process(&num, &numRemoved, prelim_contr_thr, i, o, keys, gauss_pyr[o][i]);
+				
+				cout << "Po wyslaniu danych do GPU" << endl;
+				
+				Keys* keys = detectExt->Process(&num, &numRemoved, prelim_contr_thr, i, o, gauss_pyr[o][i]);
 				//detectExt->ReceiveImageData(img);
+				
+				cout << "Po przetworzeniu" << endl;
+				
 				
 				number = num;
 
@@ -280,6 +295,8 @@ based on contrast and ratio of principal curvatures.
 					cvSeqPush( features, feat );
 					free( feat );
 				}
+				
+				cout << "Po skopiowaniu deskr" << endl;
 			}
 			/************************ GPU **************************/
 		}
@@ -766,8 +783,7 @@ Builds Gaussian scale space pyramid from an image
 			/* blur the current octave's last image to create the next one */
 			else
 			{
-				gauss_pyr[o][i] = cvCreateImage( cvGetSize(gauss_pyr[o][i-1]),
-					32, 1 );
+				gauss_pyr[o][i] = cvCreateImage( cvGetSize(gauss_pyr[o][i-1]), 32, 1 );
 
 				/************************ GPU **************************/
 				if(SIFTCPU)
@@ -843,8 +859,9 @@ Builds Gaussian scale space pyramid from an image
 			 cvSmooth( dbl, dbl, CV_GAUSSIAN, 0, 0, sig_diff, sig_diff );
 		 else
 		 {
-			 meanFilter->CreateBuffersIn(dbl->width*dbl->height*sizeof(float),1);
-			 meanFilter->CreateBuffersOut(dbl->width*dbl->height*sizeof(float),1);
+			 cout << "CreateInitialImg 1" << endl;
+			 //meanFilter->CreateBuffersIn(dbl->width*dbl->height*sizeof(float),1);
+			 //meanFilter->CreateBuffersOut(dbl->width*dbl->height*sizeof(float),1);
 			 meanFilter->SendImageToBuffers(dbl);
 			 meanFilter->Process(sig_diff);
 			 meanFilter->ReceiveImageData(dbl);
@@ -863,8 +880,9 @@ Builds Gaussian scale space pyramid from an image
 			 cvSmooth( gray, gray, CV_GAUSSIAN, 0, 0, sig_diff, sig_diff );
 		 else
 		 {
-			 meanFilter->CreateBuffersIn(gray->width*gray->height*sizeof(float),1);
-			 meanFilter->CreateBuffersOut(gray->width*gray->height*sizeof(float),1);
+			 cout << "CreateInitialImg 2" << endl;
+			 //meanFilter->CreateBuffersIn(gray->width*gray->height*sizeof(float),1);
+			 //meanFilter->CreateBuffersOut(gray->width*gray->height*sizeof(float),1);
 			 meanFilter->SendImageToBuffers(gray);
 			 meanFilter->Process(sig_diff);
 			 meanFilter->ReceiveImageData(gray);

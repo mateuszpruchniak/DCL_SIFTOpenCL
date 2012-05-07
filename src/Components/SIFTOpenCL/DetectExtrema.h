@@ -43,6 +43,6 @@ public:
 	*/
 	DetectExtrema(int _maxNumberKeys, Keys* _keys);
 	
-	bool Process( int* num, int* numRej, float prelim_contr_thr, int intvl, int octv, Keys keys[],  IplImage* img  );
+	Keys* Process( int* num, int* numRej, float prelim_contr_thr, int intvl, int octv, IplImage* img  );
 };
 

@@ -2,7 +2,7 @@
 <Task>
 	<!-- List of components -->
 	<Components>
-		
+
 		<Mov1 type="Movie" thread="Thread1" group="s1">
 			<filename>/home/mati/Sign_1_HD.avi</filename>
 		</Mov1>
@@ -11,11 +11,6 @@
 			<type>BINARY</type>
 			<maxval>192</maxval>
 		</Proc>
-
-		<Window type="CvWindow" thread="Thread1" group="s1">
-			<title>Preview</title>
-			<count>2</count>
-		</Window>
 	</Components>
 
 	<!-- Threads of execution -->
@@ -27,9 +22,7 @@
 
 	<!-- Event connections -->
 	<Events>
-		<Event source="Mov1.newImage" destination="Window.onNewImage1"/>
 		<Event source="Mov1.newImage" destination="Proc.onNewImage"/>
-		<Event source="Proc.newImage" destination="Window.onNewImage0"/>
 	</Events>
 
 	<!-- Data stream assignments -->
@@ -40,13 +33,7 @@
 
 		<Proc>
 			<in_img type="in" group="Con"/>
-			<out_img type="out" group="Con2"/>
 		</Proc>
-
-		<Window>
-			<in_img0 type="in" group="Con2"/>
-			<in_img1 type="in" group="Con"/>
-		</Window>
 	</DataStreams>
 
 </Task>
