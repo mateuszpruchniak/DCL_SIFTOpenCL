@@ -34,15 +34,71 @@ typedef struct
 	float	desc[128];
 } Keys;
 
-/*feat = new_feature();
-ddata = feat_detection_data( feat );
-feat->img_pt.x = feat->x = ( c + xc ) * pow( 2.0, octv );
-feat->img_pt.y = feat->y = ( r + xr ) * pow( 2.0, octv );
-ddata->r = r;
-ddata->c = c;
-ddata->octv = octv;
-ddata->intvl = intvl;
-ddata->subintvl = xi;*/
+
+
+
+class GPU
+ {
+  private:
+
+		cl_device_id device;
+		
+		cl_uint platforms, devices;
+
+		cl_int GPUError;
+
+		/*!
+		 * Platforms are represented by a cl_platform_id, OpenCL framework allow an application to share resources and execute kernels on devices in the platform.
+		 */
+		cl_platform_id cpPlatform;
+
+        GPU() 
+		{
+			printf("\n ----------- SINGLETON START --------------- \n");
+			// Fetch the Platform and Device IDs; we only want one.
+			GPUError =c lGetPlatformIDs(1, &cpPlatform, &platforms);
+			if (GPUError != CL_SUCCESS) {
+					printf("\n Error number %d", GPUError);
+			}
+
+			GPUError=clGetDeviceIDs(cpPlatform, CL_DEVICE_TYPE_GPU, 1, &device, &devices);
+
+			cl_context_properties properties[]={
+			CL_CONTEXT_PLATFORM, (cl_context_properties)cpPlatform,
+			0};
+	
+			// Note that nVidia's OpenCL requires the platform property
+			GPUContext = clCreateContext(properties, 1, &device, NULL, NULL, &GPUError);
+			GPUCommandQueue = clCreateCommandQueue(GPUContext, device, 0, &GPUError);
+			if (GPUError != CL_SUCCESS) {
+					printf("\n Error number %d", GPUError);
+			}
+			printf("\n ----------- SINGLETON END --------------- \n");
+		}
+
+        GPU(const singleton &);
+
+        GPU& operator=(const singleton&);
+
+  public:
+
+		/*!
+		 * OpenCL command-queue, is an object where OpenCL commands are enqueued to be executed by the device.
+		 * "The command-queue is created on a specific device in a context [...] Having multiple command-queues allows applications to queue multiple independent commands without requiring synchronization." (OpenCL Specification).
+		 */
+		cl_command_queue GPUCommandQueue; 
+		
+		/*!
+		 * Context defines the entire OpenCL environment, including OpenCL kernels, devices, memory management, command-queues, etc. Contexts in OpenCL are referenced by an cl_context object
+		 */
+		cl_context GPUContext; 
+
+        static GPU& getInstance()
+        {
+          static GPU instance;
+          return instance;
+        }
+ };
 
 
 
@@ -50,15 +106,6 @@ class GPUBase
 {
     public:
         
-		cl_device_id device;
-		
-		cl_uint platforms, devices;
-		
-	    
-		/*!
-		 * Platforms are represented by a cl_platform_id, OpenCL framework allow an application to share resources and execute kernels on devices in the platform.
-		 */
-		cl_platform_id cpPlatform;
 		
 		/*!
 		 * OpenCL command-queue, is an object where OpenCL commands are enqueued to be executed by the device.
@@ -153,4 +200,5 @@ class GPUBase
 
 		int GetKernelSize(double sigma, double cut_off=0.001);
 };
+
 
