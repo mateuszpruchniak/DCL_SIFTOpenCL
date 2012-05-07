@@ -22,7 +22,6 @@
 
 	<!-- Event connections -->
 	<Events>
-		<Event source="Mov1.newImage" destination="Window.onNewImage1"/>
 		<Event source="Mov1.newImage" destination="Proc.onNewImage"/>
 	</Events>
 
