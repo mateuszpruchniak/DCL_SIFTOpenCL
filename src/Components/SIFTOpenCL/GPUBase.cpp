@@ -5,6 +5,8 @@
 
 GPUBase::GPUBase(char* source, char* KernelName)
 {
+	
+	printf("\n ----------- GPUBase START --------------- \n");
 	kernelFuncName = KernelName;
 	size_t szKernelLength = 0;
 	size_t szKernelLengthFilter = 0;
@@ -59,7 +61,7 @@ GPUBase::GPUBase(char* source, char* KernelName)
 	GPUKernel = clCreateKernel(GPUProgram, kernelFuncName, &GPUError);
 	CheckError(GPUError);
 
-	
+	printf("\n ----------- GPUBase END --------------- \n");
 
 }
 
