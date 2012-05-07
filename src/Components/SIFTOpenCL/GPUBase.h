@@ -56,12 +56,12 @@ class GPU
 	{
 		printf("\n ----------- SINGLETON START --------------- \n");
 		// Fetch the Platform and Device IDs; we only want one.
-		GPUError =c lGetPlatformIDs(1, &cpPlatform, &platforms);
+		GPUError = clGetPlatformIDs(1, &cpPlatform, &platforms);
 		if (GPUError != CL_SUCCESS) {
 				printf("\n Error number %d", GPUError);
 		}
 
-		GPUError=clGetDeviceIDs(cpPlatform, CL_DEVICE_TYPE_GPU, 1, &device, &devices);
+		GPUError = clGetDeviceIDs(cpPlatform, CL_DEVICE_TYPE_GPU, 1, &device, &devices);
 
 		cl_context_properties properties[]={
 		CL_CONTEXT_PLATFORM, (cl_context_properties)cpPlatform,
