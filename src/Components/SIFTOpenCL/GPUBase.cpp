@@ -169,6 +169,8 @@ bool GPUBase::SendImageToBuffers(IplImage* img, ... )
 	
 	GPUError = clEnqueueWriteBuffer(GPUCommandQueue, GPU::getInstance().buffersListIn[0], CL_TRUE, 0, img->width*img->height*sizeof(float) , (void*)img->imageData, 0, NULL, NULL);
 	CheckError(GPUError);
+	
+	cout << "Po wyslaniu [0] obrazu" << endl;
 
 	va_list arg_ptr;
 	va_start(arg_ptr, img);
