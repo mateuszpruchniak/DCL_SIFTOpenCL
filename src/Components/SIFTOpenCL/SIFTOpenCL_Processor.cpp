@@ -73,13 +73,15 @@ void SIFTOpenCL_Processor::onNewImage()
 	LOG(LTRACE) << "SIFTOpenCL_Processor::onNewImage\n";
 	try {
 		
-		cout << "SIFTOpenCL_Processor::onNewImage" << endl;
 		
 		cv::Mat img = in_img.read();
 		
 		IplImage ipl = img;
 		
-		siftGPU->DoSift(&ipl);
+		int numberDesc = siftGPU->DoSift(&ipl);
+		features = siftOpenCL->feat;
+		
+		LOG(LTRACE) << "SIFTOpenCL_Processor - number desc" << numberDesc << "\n";
 		
 		out_img.write(img);
 		newImage->raise();
