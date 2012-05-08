@@ -202,7 +202,7 @@ class GPUBase
 
 	bool SendImageToBuffers(int number, ... );
 
-	bool ReceiveImageData(IplImage* img, ... );
+	bool ReceiveImageData(int number, ... );
 
 	size_t shrRoundUp(int group_size, int global_size);
 
