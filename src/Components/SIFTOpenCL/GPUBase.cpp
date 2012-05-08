@@ -166,7 +166,7 @@ bool GPUBase::SendImageToBuffers(int number, ... )
 	va_list arg_ptr;
 	va_start(arg_ptr, number);
 	
-	cout << "Liczba buf in: " << number << endl;
+	cout << "Liczba wysylanych obrazow: " << number << endl;
 	
 
 	for(int i = 0 ; i < number ; i++)
@@ -176,7 +176,7 @@ bool GPUBase::SendImageToBuffers(int number, ... )
 		imageWidth = tmpImg->width;
 		GPUError = clEnqueueWriteBuffer(GPUCommandQueue, GPU::getInstance().buffersListIn[i], CL_TRUE, 0, tmpImg->width*tmpImg->height*sizeof(float) , (void*)tmpImg->imageData, 0, NULL, NULL);
 		CheckError(GPUError);
-		cout << "Po wyslaniu [" << i << "] obrazu" << endl;
+		cout << "Po wyslaniu [" << i << "] img" << endl;
 	}
 	va_end(arg_ptr);
 
