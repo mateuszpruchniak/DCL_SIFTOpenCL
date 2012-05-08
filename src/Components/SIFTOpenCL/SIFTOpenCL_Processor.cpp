@@ -79,7 +79,7 @@ void SIFTOpenCL_Processor::onNewImage()
 		IplImage ipl = img;
 		
 		int numberDesc = siftGPU->DoSift(&ipl);
-		features = siftOpenCL->feat;
+		features = siftGPU->feat;
 		
 		LOG(LTRACE) << "SIFTOpenCL_Processor - number desc" << numberDesc << "\n";
 		
