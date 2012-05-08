@@ -187,22 +187,23 @@ bool GPUBase::SendImageToBuffers(int number, ... )
 }
 
 
-bool GPUBase::ReceiveImageData( IplImage* img, ... )
+bool GPUBase::ReceiveImageData(int number, ... )
 {
 	if(GPU::getInstance().buffersListOut == NULL)
 		return false;
 
-	GPUError = clEnqueueReadBuffer(GPUCommandQueue, GPU::getInstance().buffersListOut[0], CL_TRUE, 0, img->width*img->height*sizeof(float) , (void*)img->imageData, 0, NULL, NULL);
-	CheckError(GPUError);
-
 	va_list arg_ptr;
-	va_start(arg_ptr, img);
+	va_start(arg_ptr, number);
+	
+	cout << "Liczba odebranych obrazow: " << number << endl;
+	
 
-	for(int i = 1 ; i<GPU::getInstance().numberOfBuffersOut ; i++)
+	for(int i = 0 ; i < number ; i++)
 	{
 		IplImage* tmpImg = va_arg(arg_ptr, IplImage*);
 		GPUError = clEnqueueReadBuffer(GPUCommandQueue, GPU::getInstance().buffersListOut[i], CL_TRUE, 0, tmpImg->width*tmpImg->height*sizeof(float) , (void*)tmpImg->imageData, 0, NULL, NULL);
 		CheckError(GPUError);
+		cout << "Po odebraniu [" << i << "] img" << endl;
 	}
 	va_end(arg_ptr);
 }
