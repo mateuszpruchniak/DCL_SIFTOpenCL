@@ -200,7 +200,7 @@ class GPUBase
 
 	bool CreateBuffersOut(int maxBufferSize, int numberOfBuffers);
 
-	bool SendImageToBuffers(IplImage* img, ... );
+	bool SendImageToBuffers(int number, ... );
 
 	bool ReceiveImageData(IplImage* img, ... );
 
