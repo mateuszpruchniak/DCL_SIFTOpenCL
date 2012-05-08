@@ -256,7 +256,7 @@ based on contrast and ratio of principal curvatures.
 				/************************ GPU **************************/
 				
 				num = 0;
-				detectExt->SendImageToBuffers(dog_pyr[o][i-1],dog_pyr[o][i],dog_pyr[o][i+1], gauss_pyr[o][i]);
+				detectExt->SendImageToBuffers(3,dog_pyr[o][i-1],dog_pyr[o][i],dog_pyr[o][i+1], gauss_pyr[o][i]);
 				
 				cout << "Po wyslaniu danych do GPU" << endl;
 				
@@ -712,7 +712,7 @@ intervals of a Gaussian pyramid
 			{
 				subtract->CreateBuffersIn(gauss_pyr[o][i+1]->width*gauss_pyr[o][i+1]->height*sizeof(float),2);
 				subtract->CreateBuffersOut(gauss_pyr[o][i]->width*gauss_pyr[o][i]->height*sizeof(float),1);
-				subtract->SendImageToBuffers(gauss_pyr[o][i+1],gauss_pyr[o][i]);
+				subtract->SendImageToBuffers(2,gauss_pyr[o][i+1],gauss_pyr[o][i]);
 				subtract->Process();
 				subtract->ReceiveImageData(dog_pyr[o][i]);
 			}
@@ -791,7 +791,7 @@ Builds Gaussian scale space pyramid from an image
 				{
 					meanFilter->CreateBuffersIn(gauss_pyr[o][i-1]->width*gauss_pyr[o][i-1]->height*sizeof(float),1);
 					meanFilter->CreateBuffersOut(gauss_pyr[o][i]->width*gauss_pyr[o][i]->height*sizeof(float),1);
-					meanFilter->SendImageToBuffers(gauss_pyr[o][i-1]);
+					meanFilter->SendImageToBuffers(1,gauss_pyr[o][i-1]);
 					meanFilter->Process(sig[i]);
 					meanFilter->ReceiveImageData(gauss_pyr[o][i]);
 				}
@@ -861,7 +861,7 @@ Builds Gaussian scale space pyramid from an image
 			 cout << "CreateInitialImg 1" << endl;
 			 //meanFilter->CreateBuffersIn(dbl->width*dbl->height*sizeof(float),1);
 			 //meanFilter->CreateBuffersOut(dbl->width*dbl->height*sizeof(float),1);
-			 meanFilter->SendImageToBuffers(dbl);
+			 meanFilter->SendImageToBuffers(1,dbl);
 			 meanFilter->Process(sig_diff);
 			 meanFilter->ReceiveImageData(dbl);
 		 }
@@ -882,7 +882,7 @@ Builds Gaussian scale space pyramid from an image
 			 cout << "CreateInitialImg 2" << endl;
 			 //meanFilter->CreateBuffersIn(gray->width*gray->height*sizeof(float),1);
 			 //meanFilter->CreateBuffersOut(gray->width*gray->height*sizeof(float),1);
-			 meanFilter->SendImageToBuffers(gray);
+			 meanFilter->SendImageToBuffers(1,gray);
 			 meanFilter->Process(sig_diff);
 			 meanFilter->ReceiveImageData(gray);
 		 }
