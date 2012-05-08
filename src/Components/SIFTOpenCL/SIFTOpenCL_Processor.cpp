@@ -72,17 +72,24 @@ void SIFTOpenCL_Processor::onNewImage()
 {
 	LOG(LTRACE) << "SIFTOpenCL_Processor::onNewImage\n";
 	try {
-		
-		
 		cv::Mat img = in_img.read();
-		
 		IplImage ipl = img;
-		
 		cout << "SIFTOpenCL_Processor::onNewImage " << endl;
 		
-		//int numberDesc = siftGPU->DoSift(&ipl);
-		//features = siftGPU->feat;
-		//LOG(LTRACE) << "SIFTOpenCL_Processor - number desc" << numberDesc << "\n";
+		
+		clock_t start, finish;
+		double duration = 0;
+		start = clock();
+		
+			int numberDesc = siftGPU->DoSift(&ipl);
+			features = siftGPU->feat;
+			
+		finish = clock();
+		duration = (double)(finish - start) / CLOCKS_PER_SEC;
+		cout << "PROCESSING TIME GPU: " << endl;
+		cout << duration << endl;
+		
+		cout << "SIFTOpenCL_Processor - number desc " << numberDesc << endl;
 		
 		out_img.write(img);
 		newImage->raise();

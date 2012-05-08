@@ -83,6 +83,8 @@ bool GPU::CreateBuffersIn(int maxBufferSize, int numbOfBuffers)
 			}
 		}
 		
+		cout << "Tworzenie bufora In" << endl;
+		
 		maxNumberBufIn = maxBufferSize;
 		numberOfBuffersIn = numbOfBuffers;
 		buffersListIn = new cl_mem[numberOfBuffersIn];
@@ -90,7 +92,6 @@ bool GPU::CreateBuffersIn(int maxBufferSize, int numbOfBuffers)
 		for (int i = 0; i < numberOfBuffersIn ; i++)
 		{
 			buffersListIn[i] = clCreateBuffer(GPUContext, CL_MEM_READ_WRITE, maxBufferSize, NULL, &GPUError);
-			cout << "Alokacja buforu wynik: " << GPUError << endl;
 		}
 	}
 	return true;
@@ -110,6 +111,8 @@ bool GPU::CreateBuffersOut( int maxBufferSize, int numbOfBuffers)
 			}
 		}
 		
+		cout << "Tworzenie bufora Out" << endl;
+		
 		maxNumberBufOut = maxBufferSize;
 		numberOfBuffersOut = numbOfBuffers;
 		buffersListOut = new cl_mem[numberOfBuffersOut];
@@ -117,7 +120,6 @@ bool GPU::CreateBuffersOut( int maxBufferSize, int numbOfBuffers)
 		for (int i = 0; i < numberOfBuffersOut ; i++)
 		{
 			buffersListOut[i] = clCreateBuffer(GPUContext, CL_MEM_READ_WRITE, maxBufferSize, NULL, &GPUError);
-			cout << "Alokacja buforu wynik: " << GPUError << endl;
 		}
 	}
 	return true;
@@ -157,16 +159,9 @@ bool GPUBase::SendImageToBuffers(int number, ... )
 	if(GPU::getInstance().buffersListIn == NULL)
 		return false;
 
-	//clock_t start, finish;
-	//double duration = 0;
-	//start = clock();
-
-	
 
 	va_list arg_ptr;
 	va_start(arg_ptr, number);
-	
-	cout << "Liczba wysylanych obrazow: " << number << endl;
 	
 
 	for(int i = 0 ; i < number ; i++)
@@ -176,14 +171,8 @@ bool GPUBase::SendImageToBuffers(int number, ... )
 		imageWidth = tmpImg->width;
 		GPUError = clEnqueueWriteBuffer(GPUCommandQueue, GPU::getInstance().buffersListIn[i], CL_TRUE, 0, tmpImg->width*tmpImg->height*sizeof(float) , (void*)tmpImg->imageData, 0, NULL, NULL);
 		CheckError(GPUError);
-		cout << "Po wyslaniu [" << i << "] img" << endl;
 	}
 	va_end(arg_ptr);
-
-	//finish = clock();
-	//duration = (double)(finish - start) / CLOCKS_PER_SEC;
-	//cout << "SEND IMG TO GPU: " << endl;
-	//cout << duration << endl;
 }
 
 
@@ -194,16 +183,12 @@ bool GPUBase::ReceiveImageData(int number, ... )
 
 	va_list arg_ptr;
 	va_start(arg_ptr, number);
-	
-	cout << "Liczba odebranych obrazow: " << number << endl;
-	
 
 	for(int i = 0 ; i < number ; i++)
 	{
 		IplImage* tmpImg = va_arg(arg_ptr, IplImage*);
 		GPUError = clEnqueueReadBuffer(GPUCommandQueue, GPU::getInstance().buffersListOut[i], CL_TRUE, 0, tmpImg->width*tmpImg->height*sizeof(float) , (void*)tmpImg->imageData, 0, NULL, NULL);
 		CheckError(GPUError);
-		cout << "Po odebraniu [" << i << "] img" << endl;
 	}
 	va_end(arg_ptr);
 }

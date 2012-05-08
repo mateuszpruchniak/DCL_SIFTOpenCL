@@ -9,10 +9,6 @@ DetectExtrema::~DetectExtrema(void)
 
 DetectExtrema::DetectExtrema(int _maxNumberKeys, Keys* _keys): GPUBase("/home/mati/Dropbox/MGR/DisCODe/DCL_SIFTOpenCL/src/Components/SIFTOpenCL/OpenCL/DetectExtrema.cl","ckDetect")
 {
-	printf("DetectExtrema Constr \n");
-	
-	
-	
 	counter = 0;
 	numberExtr = 0;
 	numberExtrRej = 0;
@@ -33,7 +29,6 @@ DetectExtrema::DetectExtrema(int _maxNumberKeys, Keys* _keys): GPUBase("/home/ma
 		keys[i].scy = 0.0;
 	}
 	
-	cout << "Po wyzerowaniu" << endl;
 
 	cmDevBufNumber = clCreateBuffer(GPUContext, CL_MEM_READ_WRITE, sizeof(int), NULL, &GPUError);
 	CheckError(GPUError);
@@ -50,21 +45,17 @@ DetectExtrema::DetectExtrema(int _maxNumberKeys, Keys* _keys): GPUBase("/home/ma
 	GPUError = clEnqueueWriteBuffer(GPUCommandQueue, cmDevBufCount, CL_TRUE, 0, sizeof(int), (void*)&counter, 0, NULL, NULL);
 	CheckError(GPUError);
 
-	cout << "Max number:" << maxNumberKeys << endl;
 	
 	cmDevBufKeys = clCreateBuffer(GPUContext, CL_MEM_READ_WRITE, maxNumberKeys*sizeof(Keys), NULL, &GPUError);
 	CheckError(GPUError);
 	GPUError = clEnqueueWriteBuffer(GPUCommandQueue, cmDevBufKeys, CL_TRUE, 0, maxNumberKeys*sizeof(Keys), (void*)keys, 0, NULL, NULL);
 	CheckError(GPUError);
 
-	printf("clCreateKernel Before  \n");
 	
 	GPUKernelDesc = clCreateKernel(GPUProgram, "ckDesc", &GPUError);
 	CheckError(GPUError);
 	
 	
-	
-	printf("clCreateKernel After \n");
 
 }
 
@@ -81,8 +72,6 @@ Keys* DetectExtrema::Process( int* numExtr, int* numExtrRej, float prelim_contr_
 	GPUError = clEnqueueWriteBuffer(GPUCommandQueue, cmDevBufNumberReject, CL_TRUE, 0, sizeof(int), (void*)&numberExtrRej, 0, NULL, NULL);
 	CheckError(GPUError);
 
-	cout << "Wyslanie licznikow" << endl;
-	
 	size_t GPULocalWorkSize[2];
 	GPULocalWorkSize[0] = iBlockDimX;
 	GPULocalWorkSize[1] = iBlockDimY;
@@ -112,8 +101,6 @@ Keys* DetectExtrema::Process( int* numExtr, int* numExtrRej, float prelim_contr_
 	GPUError = clEnqueueReadBuffer(GPUCommandQueue, cmDevBufNumberReject, CL_TRUE, 0, sizeof(int), (void*)&numberExtrRej, 0, NULL, NULL);
 	CheckError(GPUError);
 	
-	
-	cout << "Odczytana liczba extr: " << numberExtr << endl;
 
 	*numExtr = numberExtr;
 	*numExtrRej = numberExtrRej;
@@ -142,17 +129,11 @@ Keys* DetectExtrema::Process( int* numExtr, int* numExtrRej, float prelim_contr_
 	}
 	
 	
-	cout << "Po wyliczeniu deskr" << endl;
-	
 	GPUError = clEnqueueReadBuffer(GPUCommandQueue, cmDevBufCount, CL_TRUE, 0, sizeof(int), (void*)&counter, 0, NULL, NULL);
 	CheckError(GPUError);
-
-	cout << "Licznik maxNumberKeys: " << maxNumberKeys << endl;
 	
 	GPUError = clEnqueueReadBuffer(GPUCommandQueue, cmDevBufKeys, CL_TRUE, 0, maxNumberKeys*sizeof(Keys), (void*)keys, 0, NULL, NULL);
 	CheckError(GPUError);
-	
-	cout << "Po odczytaniu deskryptorow" << endl;
 	
 
 	return keys;

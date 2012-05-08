@@ -56,8 +56,6 @@ int FeatureCmp( void* feat1, void* feat2, void* param )
 	CvSeq* features;
 	int octvs, i, n = 0;
 	
-	cout << "Stworzenie buforu obrazu: " << 2 * img->width << "x" << 2 * img->height << endl;
-	
 	meanFilter->CreateBuffersIn(4*img->width*img->height*sizeof(float),5);
 	meanFilter->CreateBuffersOut(4*img->width*img->height*sizeof(float),3);
 
@@ -71,28 +69,18 @@ int FeatureCmp( void* feat1, void* feat2, void* param )
 
 	init_img = CreateInitialImg( img, img_dbl, sigma );
 	
-	cout << "1 CreateInitialImg " << endl;
-
 	octvs = log( (float)MIN( init_img->width, init_img->height ) ) / log((float)2) - 2;
-	
-	cout << "Liczba octvs: " << octvs << endl;
-	
 	
 	gauss_pyr = BuildGaussPyr( init_img, octvs, intvls, sigma );
 	
-	cout << "BuildGaussPyr" << endl;
 	
 	dog_pyr = BuildDogPyr( gauss_pyr, octvs, intvls );
 	
-	cout << "BuildDogPyr" << endl;
-	
 	storage = cvCreateMemStorage( 0 );
 	
-	cout << "cvCreateMemStorage" << endl;
 
 	features = ScaleSpaceExtrema( dog_pyr, octvs, intvls, contr_thr, curv_thr, storage );
 
-	cout << "ScaleSpaceExtrema" << endl;
 
 	/* sort features by decreasing scale and move from CvSeq to array */
 	
@@ -187,12 +175,6 @@ based on contrast and ratio of principal curvatures.
 	detectExt->CreateBuffersOut(img->width*img->height*sizeof(float),1);
 	/************************ GPU **************************/
 
-	cout << "Po stworzeniu buforow" << endl;
-	
-	clock_t start, finish;
-	double duration = 0;
-	start = clock();
-
 	for( o = 0; o < octvs; o++ )
 		for( i = 1; i <= intvls; i++ )
 		{
@@ -258,12 +240,8 @@ based on contrast and ratio of principal curvatures.
 				num = 0;
 				detectExt->SendImageToBuffers(3,dog_pyr[o][i-1],dog_pyr[o][i],dog_pyr[o][i+1], gauss_pyr[o][i]);
 				
-				cout << "Po wyslaniu danych do GPU" << endl;
-				
 				Keys* keys = detectExt->Process(&num, &numRemoved, prelim_contr_thr, i, o, gauss_pyr[o][i]);
 				//detectExt->ReceiveImageData(img);
-				
-				cout << "Po przetworzeniu" << endl;
 				
 				
 				number = num;
@@ -295,17 +273,10 @@ based on contrast and ratio of principal curvatures.
 					free( feat );
 				}
 				
-				cout << "Po skopiowaniu deskr" << endl;
 			}
 			/************************ GPU **************************/
 		}
 
-		finish = clock();
-		duration = (double)(finish - start) / CLOCKS_PER_SEC;
-		cout << endl;
-		cout << "SIFT netto: " << endl;
-		cout << duration << endl;
-		cout << endl;
 	return features;
 }
 
@@ -858,7 +829,6 @@ Builds Gaussian scale space pyramid from an image
 			 cvSmooth( dbl, dbl, CV_GAUSSIAN, 0, 0, sig_diff, sig_diff );
 		 else
 		 {
-			 cout << "CreateInitialImg 1" << endl;
 			 //meanFilter->CreateBuffersIn(dbl->width*dbl->height*sizeof(float),1);
 			 //meanFilter->CreateBuffersOut(dbl->width*dbl->height*sizeof(float),1);
 			 meanFilter->SendImageToBuffers(1,dbl);
@@ -879,7 +849,6 @@ Builds Gaussian scale space pyramid from an image
 			 cvSmooth( gray, gray, CV_GAUSSIAN, 0, 0, sig_diff, sig_diff );
 		 else
 		 {
-			 cout << "CreateInitialImg 2" << endl;
 			 //meanFilter->CreateBuffersIn(gray->width*gray->height*sizeof(float),1);
 			 //meanFilter->CreateBuffersOut(gray->width*gray->height*sizeof(float),1);
 			 meanFilter->SendImageToBuffers(1,gray);
