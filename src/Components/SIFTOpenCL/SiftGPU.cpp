@@ -65,8 +65,7 @@ int FeatureCmp( void* feat1, void* feat2, void* param )
 	if( ! img )
 		printf( "NULL pointer error, %s, line %d",  __FILE__, __LINE__ );
 
-	if( ! feat )
-		printf( "NULL pointer error, %s, line %d",  __FILE__, __LINE__ );
+	
 
 	/* build scale space pyramid; smallest dimension of top level is ~4 pixels */
 
