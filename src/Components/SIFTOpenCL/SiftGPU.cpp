@@ -714,7 +714,7 @@ intervals of a Gaussian pyramid
 				subtract->CreateBuffersOut(gauss_pyr[o][i]->width*gauss_pyr[o][i]->height*sizeof(float),1);
 				subtract->SendImageToBuffers(2,gauss_pyr[o][i+1],gauss_pyr[o][i]);
 				subtract->Process();
-				subtract->ReceiveImageData(dog_pyr[o][i]);
+				subtract->ReceiveImageData(1,dog_pyr[o][i]);
 			}
 			/************************ GPU **************************/
 
@@ -793,7 +793,7 @@ Builds Gaussian scale space pyramid from an image
 					meanFilter->CreateBuffersOut(gauss_pyr[o][i]->width*gauss_pyr[o][i]->height*sizeof(float),1);
 					meanFilter->SendImageToBuffers(1,gauss_pyr[o][i-1]);
 					meanFilter->Process(sig[i]);
-					meanFilter->ReceiveImageData(gauss_pyr[o][i]);
+					meanFilter->ReceiveImageData(1,gauss_pyr[o][i]);
 				}
 				/************************ GPU **************************/
 				
@@ -863,7 +863,7 @@ Builds Gaussian scale space pyramid from an image
 			 //meanFilter->CreateBuffersOut(dbl->width*dbl->height*sizeof(float),1);
 			 meanFilter->SendImageToBuffers(1,dbl);
 			 meanFilter->Process(sig_diff);
-			 meanFilter->ReceiveImageData(dbl);
+			 meanFilter->ReceiveImageData(1,dbl);
 		 }
 		 /************************ GPU **************************/
 
@@ -884,7 +884,7 @@ Builds Gaussian scale space pyramid from an image
 			 //meanFilter->CreateBuffersOut(gray->width*gray->height*sizeof(float),1);
 			 meanFilter->SendImageToBuffers(1,gray);
 			 meanFilter->Process(sig_diff);
-			 meanFilter->ReceiveImageData(gray);
+			 meanFilter->ReceiveImageData(1,gray);
 		 }
 		 /************************ GPU **************************/
 
