@@ -70,13 +70,15 @@ bool SIFTOpenCL_Processor::onStart()
 
 void SIFTOpenCL_Processor::onNewImage()
 {
-	LOG(LTRACE) << "SIFTOpenCL_Processor::onNewImage\n";
+	
 	try {
 		
 		
 		cv::Mat img = in_img.read();
 		
 		IplImage ipl = img;
+		
+		LOG(LTRACE) << "SIFTOpenCL_Processor::onNewImage\n";
 		
 		//int numberDesc = siftGPU->DoSift(&ipl);
 		//features = siftGPU->feat;
