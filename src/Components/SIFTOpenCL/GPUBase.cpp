@@ -161,19 +161,19 @@ bool GPUBase::SendImageToBuffers(int number, ... )
 	//double duration = 0;
 	//start = clock();
 
-	imageHeight = img->height;
-	imageWidth = img->width;
+	
 
 	va_list arg_ptr;
 	va_start(arg_ptr, number);
 	
-	cout << "Zapis do buforu obrazu: " << img->width << "x" << img->height << endl;
 	cout << "Liczba buf in: " << number << endl;
 	
 
 	for(int i = 0 ; i < number ; i++)
 	{
 		IplImage* tmpImg = va_arg(arg_ptr, IplImage*);
+		imageHeight = tmpImg->height;
+		imageWidth = tmpImg->width;
 		GPUError = clEnqueueWriteBuffer(GPUCommandQueue, GPU::getInstance().buffersListIn[i], CL_TRUE, 0, tmpImg->width*tmpImg->height*sizeof(float) , (void*)tmpImg->imageData, 0, NULL, NULL);
 		CheckError(GPUError);
 		cout << "Po wyslaniu [" << i << "] obrazu" << endl;
